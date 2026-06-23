@@ -1,8 +1,13 @@
 // Dynamically select base URL. Supports VITE_API_URL environment variable.
 const getBaseUrl = (): string => {
   const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) return envUrl;
-  return 'http://localhost:5000/api';
+  let url = envUrl || 'https://campus-sync-backend-rp4d.onrender.com/api';
+  
+  // Auto-correct http to https for Render deployment domains to prevent Mixed Content blocks
+  if (url.startsWith('http://') && url.includes('.onrender.com')) {
+    url = url.replace('http://', 'https://');
+  }
+  return url;
 };
 
 const BASE_URL = getBaseUrl();
