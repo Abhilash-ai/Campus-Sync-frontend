@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 font-sans transition-colors duration-300 antialiased overflow-x-hidden;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.12) 0px, transparent 50%),
+      radial-gradient(at 50% 0%, rgba(79, 70, 229, 0.08) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  body.light {
+    @apply bg-slate-50 text-slate-900;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 40%),
+      radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.06) 0px, transparent 40%),
+      radial-gradient(at 50% 0%, rgba(79, 70, 229, 0.04) 0px, transparent 40%);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-800/80 rounded-full hover:bg-slate-700/80;
+  }
+  body.light ::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 hover:bg-slate-300;
+  }
+}
+
+@layer components {
+  /* Glassmorphism Styles */
+  .glass-panel {
+    @apply bg-slate-900/60 backdrop-blur-xl border border-slate-800/50 shadow-2xl;
+  }
+  .light .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-slate-200/60 shadow-xl;
+  }
+
+  .glass-card {
+    @apply bg-slate-900/40 backdrop-blur-md border border-slate-800/30 rounded-2xl shadow-lg transition-all duration-300 hover:border-brand-500/30 hover:bg-slate-900/50;
+  }
+  .light .glass-card {
+    @apply bg-white/50 backdrop-blur-md border border-slate-200/50 rounded-2xl shadow-md transition-all duration-300 hover:border-brand-500/20 hover:bg-white/75;
+  }
+
+  .glass-input {
+    @apply bg-slate-950/40 border border-slate-800/80 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-all duration-200 placeholder-slate-500;
+  }
+  .light .glass-input {
+    @apply bg-white/30 border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-all duration-200 placeholder-slate-400;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-brand-600 to-indigo-600 text-white rounded-xl font-medium shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:from-brand-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2;
+  }
+  .btn-secondary {
+    @apply bg-slate-900/80 hover:bg-slate-800/80 border border-slate-800/80 text-slate-300 rounded-xl font-medium focus:outline-none transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2;
+  }
+  .light .btn-secondary {
+    @apply bg-white/90 hover:bg-slate-100 border border-slate-200 text-slate-700;
+  }
+  
+  .badge-present {
+    @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider;
+  }
+  .light .badge-present {
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+
+  .badge-absent {
+    @apply bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider;
+  }
+  .light .badge-absent {
+    @apply bg-rose-50 text-rose-700 border border-rose-200;
+  }
+
+  .badge-late {
+    @apply bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider;
+  }
+  .light .badge-late {
+    @apply bg-amber-50 text-amber-700 border border-amber-200;
+  }
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-brand-400 via-indigo-300 to-indigo-500 bg-clip-text text-transparent;
+}
+.light .text-gradient {
+  @apply bg-gradient-to-r from-brand-600 via-indigo-600 to-violet-800 bg-clip-text text-transparent;
+}
+
+.text-gradient-purple {
+  @apply bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent;
+}
+.light .text-gradient-purple {
+  @apply bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent;
+}

@@ -1,0 +1,17 @@
+# Ignore dependencies and build assets
+node_modules/
+dist/
+build/
+
+# Ignore Python virtual environments, compiled files, and local DBs
+venv/
+.venv/
+env/
+*.pyc
+__pycache__/
+database.json
+.env
+
+# System files
+.DS_Store
+Thumbs.db
