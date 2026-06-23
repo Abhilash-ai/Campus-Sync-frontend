@@ -24,9 +24,9 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers.set('Content-Type', 'application/json');
   }
 
-  // Setup abort controller for a 6-second timeout
+  // Setup abort controller for a 50-second timeout (accommodates Render free tier cold starts)
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 6000);
+  const timeoutId = setTimeout(() => controller.abort(), 50000);
 
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, {
