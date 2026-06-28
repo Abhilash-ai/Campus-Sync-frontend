@@ -28,6 +28,28 @@ export const Signup: React.FC = () => {
       return;
     }
 
+    // Password Policy Validation
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (password.toLowerCase().includes(username.toLowerCase())) {
+      setError('Password cannot contain your username.');
+      return;
+    }
+    if (!/[A-Za-z]/.test(password)) {
+      setError('Password must contain at least one letter.');
+      return;
+    }
+    if (!/\d/.test(password)) {
+      setError('Password must contain at least one number.');
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      setError('Password must contain at least one special character.');
+      return;
+    }
+
     setError(null);
     setSuccess(null);
     setLoading(true);

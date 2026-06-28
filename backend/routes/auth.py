@@ -25,6 +25,20 @@ def signup():
     if student_id:
         student_id = student_id.strip().upper()
 
+    # Password Policy Validation
+    if len(password) < 8:
+        return jsonify({'message': 'Password must be at least 8 characters long.'}), 400
+    if username.lower() in password.lower():
+        return jsonify({'message': 'Password cannot contain your username.'}), 400
+    
+    import re
+    if not re.search(r'[A-Za-z]', password):
+        return jsonify({'message': 'Password must contain at least one letter.'}), 400
+    if not re.search(r'\d', password):
+        return jsonify({'message': 'Password must contain at least one number.'}), 400
+    if not re.search(r'[^A-Za-z0-9]', password):
+        return jsonify({'message': 'Password must contain at least one special character.'}), 400
+
     # Check if user already exists
     if db.users.find_one({'email': email}):
         return jsonify({'message': 'Email already registered.'}), 409
