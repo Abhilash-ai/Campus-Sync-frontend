@@ -1,5 +1,9 @@
 # CampusSync — One Platform for Campus Intelligence
 
+
+[![Live Demo](https://img.shields.io/badge/Demo-Live-6366f1?style=for-the-badge&logo=vercel)](https://campussync-ai.vercel.app/)
+
+
 CampusSync is a production-ready, contactless campus intelligence and attendance analytics system. It integrates high-fidelity face recognition logging, QR identity passport verification, teacher manual overrides, and academic performance correlation dashboards.
 
 ---
