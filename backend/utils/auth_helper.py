@@ -7,7 +7,7 @@ from config import Config
 from database import db
 
 def hash_password(password):
-    return generate_password_hash(password)
+    return generate_password_hash(password, method='pbkdf2:sha256:10000')
 
 def verify_password(stored_password, provided_password):
     return check_password_hash(stored_password, provided_password)
