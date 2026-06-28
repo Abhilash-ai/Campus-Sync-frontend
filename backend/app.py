@@ -7,6 +7,9 @@ from routes.auth import auth_bp
 from routes.student import student_bp
 from routes.attendance import attendance_bp
 from routes.analytics import analytics_bp
+from routes.notices import notices_bp
+from routes.timetable import timetable_bp
+from routes.assignments import assignments_bp
 from utils.auth_helper import hash_password
 
 app = Flask(__name__)
@@ -20,6 +23,9 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(student_bp, url_prefix='/api/students')
 app.register_blueprint(attendance_bp, url_prefix='/api/attendance')
 app.register_blueprint(analytics_bp, url_prefix='/api/analytics')
+app.register_blueprint(notices_bp, url_prefix='/api/notices')
+app.register_blueprint(timetable_bp, url_prefix='/api/timetable')
+app.register_blueprint(assignments_bp, url_prefix='/api/assignments')
 
 @app.route('/api/health', methods=['GET'])
 def health_check():

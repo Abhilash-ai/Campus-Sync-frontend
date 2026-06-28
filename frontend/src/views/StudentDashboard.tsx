@@ -12,7 +12,8 @@ import {
   AlertTriangle,
   Lightbulb,
   Download,
-  Fingerprint
+  Fingerprint,
+  Printer
 } from 'lucide-react';
 
 interface AttendanceLog {
@@ -118,9 +119,9 @@ export const StudentDashboard: React.FC = () => {
     : '';
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-      {/* Col 1 & 2: Stats, History & Grades */}
-      <div className="lg:col-span-2 flex flex-col gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn print:block print:w-full print:m-0 print:p-0">
+      {/* Col 1 & 2: Stats, History & Grades (HIDDEN ON PRINT) */}
+      <div className="lg:col-span-2 flex flex-col gap-6 print:hidden">
         {/* Row 1: Key Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {/* Attendance Pct */}
@@ -253,47 +254,47 @@ export const StudentDashboard: React.FC = () => {
       </div>
 
       {/* Col 3: Student digital QR Identity Card */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 print:block print:w-[2.125in] print:h-[3.375in] print:m-auto print:border print:border-black print:rounded-xl">
         {/* QR ID card wrapper */}
-        <div className="glass-panel p-6 rounded-3xl border border-slate-800/40 relative overflow-hidden flex flex-col items-center">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-800/40 relative overflow-hidden flex flex-col items-center print:border-none print:shadow-none print:rounded-none print:p-4 print:bg-white print:text-black">
           {/* Card Accent Banner */}
-          <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-brand-500 via-indigo-500 to-purple-600"></div>
+          <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-brand-500 via-indigo-500 to-purple-600 print:bg-indigo-600"></div>
           
           <div className="w-full flex justify-between items-center mb-6 mt-1">
-            <span className="text-xxs font-extrabold text-brand-400 uppercase tracking-widest light:text-brand-600">Digital Passport</span>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">CampusSync Identity</span>
+            <span className="text-xxs font-extrabold text-brand-400 uppercase tracking-widest light:text-brand-600 print:text-indigo-600">Digital Passport</span>
+            <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider print:text-gray-500">CampusSync Identity</span>
           </div>
 
           {/* Student Profile photo mock */}
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-brand-650 to-indigo-650 flex items-center justify-center text-white border border-brand-500/30 text-3xl font-bold uppercase tracking-wider shadow-lg shadow-brand-500/10 mb-4">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-brand-650 to-indigo-650 flex items-center justify-center text-white border border-brand-500/30 text-3xl font-bold uppercase tracking-wider shadow-lg shadow-brand-500/10 mb-4 print:border-indigo-600 print:bg-indigo-600 print:text-white print:shadow-none">
             {profile?.name.substring(0, 2)}
           </div>
 
-          <h3 className="text-lg font-bold tracking-tight text-center">{profile?.name}</h3>
-          <span className="text-xs text-brand-400 font-bold tracking-tight text-center mt-0.5 light:text-brand-600">
+          <h3 className="text-lg font-bold tracking-tight text-center print:text-black">{profile?.name}</h3>
+          <span className="text-xs text-brand-400 font-bold tracking-tight text-center mt-0.5 light:text-brand-600 print:text-indigo-600">
             {profile?.roll_number}
           </span>
 
-          <div className="w-full grid grid-cols-2 gap-4 border-y border-slate-800/40 py-4 my-5 text-center text-xs light:border-slate-200">
+          <div className="w-full grid grid-cols-2 gap-4 border-y border-slate-800/40 py-4 my-5 text-center text-xs light:border-slate-200 print:border-gray-300">
             <div>
-              <span className="text-xxs text-slate-500 block uppercase tracking-wider">Department</span>
-              <span className="font-semibold text-slate-300 light:text-slate-800 block mt-0.5">{profile?.department}</span>
+              <span className="text-xxs text-slate-500 block uppercase tracking-wider print:text-gray-500">Department</span>
+              <span className="font-semibold text-slate-300 light:text-slate-800 block mt-0.5 print:text-black">{profile?.department}</span>
             </div>
             <div>
-              <span className="text-xxs text-slate-500 block uppercase tracking-wider">Semester</span>
-              <span className="font-semibold text-slate-300 light:text-slate-800 block mt-0.5">{profile?.semester}</span>
+              <span className="text-xxs text-slate-500 block uppercase tracking-wider print:text-gray-500">Semester</span>
+              <span className="font-semibold text-slate-300 light:text-slate-800 block mt-0.5 print:text-black">{profile?.semester}</span>
             </div>
           </div>
 
           {/* QR code block */}
           {qrCodeUrl ? (
-            <div className="p-3 bg-white rounded-2xl border border-slate-250 shadow-inner flex flex-col items-center">
+            <div className="p-3 bg-white rounded-2xl border border-slate-250 shadow-inner flex flex-col items-center print:border-none print:shadow-none print:p-0">
               <img 
                 src={qrCodeUrl} 
                 alt="Student QR Identity Code" 
-                className="w-44 h-44 object-contain"
+                className="w-44 h-44 object-contain print:w-32 print:h-32"
               />
-              <span className="text-[10px] font-mono font-bold text-slate-500 tracking-widest mt-2 block uppercase select-all">
+              <span className="text-[10px] font-mono font-bold text-slate-500 tracking-widest mt-2 block uppercase select-all print:text-gray-500">
                 {profile?.qr_identity}
               </span>
             </div>
@@ -303,16 +304,25 @@ export const StudentDashboard: React.FC = () => {
             </div>
           )}
 
-          <div className="w-full flex flex-col gap-2.5 mt-6">
-            <a 
-              href={qrCodeUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-secondary w-full py-2.5 text-xs flex items-center justify-center gap-1.5"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Download Badge QR
-            </a>
+          <div className="w-full flex flex-col gap-2.5 mt-6 print:hidden">
+            <div className="grid grid-cols-2 gap-2.5">
+              <a 
+                href={qrCodeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-secondary py-2.5 text-xs flex items-center justify-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                QR
+              </a>
+              <button 
+                onClick={() => window.print()}
+                className="btn-primary py-2.5 text-xs flex items-center justify-center gap-1.5"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                Print ID
+              </button>
+            </div>
             
             <div className="flex items-center justify-center gap-1.5 text-xxs text-slate-500 text-center mt-1 light:text-slate-600">
               <Fingerprint className="w-3.5 h-3.5 text-indigo-400" />
@@ -323,7 +333,7 @@ export const StudentDashboard: React.FC = () => {
 
         {/* Academic Marks Detailed Module */}
         {profile && (
-          <div className="glass-panel p-6 rounded-3xl border border-slate-800/40">
+          <div className="glass-panel p-6 rounded-3xl border border-slate-800/40 print:hidden">
             <div className="flex items-center gap-2 mb-4">
               <GraduationCap className="w-4.5 h-4.5 text-brand-400" />
               <h4 className="text-sm font-bold tracking-tight">Academic Performance</h4>

@@ -20,7 +20,9 @@ import {
   BookOpen,
   Calendar,
   Settings,
-  AlertTriangle
+  AlertTriangle,
+  UploadCloud,
+  FileText
 } from 'lucide-react';
 
 interface Student {
@@ -56,6 +58,12 @@ export const TeacherDashboard: React.FC = () => {
   // Add / Edit Modal Drawer State
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  
+  // CSV Import State
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{ message: string; errors: string[] } | null>(null);
   
   // Modal Form states
   const [stuId, setStuId] = useState('');
@@ -162,6 +170,51 @@ export const TeacherDashboard: React.FC = () => {
       fetchData();
     } catch (err: any) {
       alert(err.message || 'Failed to delete student.');
+    }
+  };
+
+  const handleImportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!csvFile) return;
+    
+    setImporting(true);
+    setImportResult(null);
+    setError(null);
+    
+    const formData = new FormData();
+    formData.append('file', csvFile);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://127.0.0.1:5000/api/students/bulk-import', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to import CSV.');
+      }
+      
+      setImportResult(data);
+      if (data.errors && data.errors.length === 0) {
+        setTimeout(() => {
+          setShowImportModal(false);
+          setCsvFile(null);
+          setImportResult(null);
+          fetchData();
+        }, 2000);
+      } else {
+        fetchData();
+      }
+    } catch (err: any) {
+      setError(err.message || 'Network error during upload.');
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -306,14 +359,32 @@ export const TeacherDashboard: React.FC = () => {
               />
             </div>
 
-            {/* Add Student Button */}
-            <button 
-              onClick={() => setShowAddModal(true)}
-              className="btn-primary py-2 px-4 text-sm w-full sm:w-auto"
-            >
-              <Plus className="w-4 h-4" />
-              Add Student
-            </button>
+            {/* Action Buttons */}
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button 
+                onClick={() => {
+                  setImportResult(null);
+                  setCsvFile(null);
+                  setError(null);
+                  setShowImportModal(true);
+                }}
+                className="btn-secondary py-2.5 px-4 w-full sm:w-auto flex items-center justify-center"
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span className="hidden sm:inline">Import CSV</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setError(null);
+                  setShowAddModal(true);
+                }}
+                className="btn-primary py-2.5 px-4 w-full sm:w-auto flex items-center justify-center"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Add Student</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -632,6 +703,81 @@ export const TeacherDashboard: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* CSV Import Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="glass-panel w-full max-w-md rounded-3xl border border-slate-700/50 shadow-2xl overflow-hidden light:bg-white light:border-slate-200">
+            <div className="p-6 border-b border-slate-800/50 flex justify-between items-center light:border-slate-100">
+              <h3 className="text-xl font-bold tracking-tight">Bulk Import Students</h3>
+              <button onClick={() => setShowImportModal(false)} className="text-slate-400 hover:text-white p-1">
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              {error && (
+                <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  {error}
+                </div>
+              )}
+              
+              {importResult && (
+                <div className={`mb-4 p-3 border rounded-xl text-xs flex flex-col gap-2 ${
+                  importResult.errors.length > 0 ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                }`}>
+                  <div className="font-bold">{importResult.message}</div>
+                  {importResult.errors.length > 0 && (
+                    <div className="max-h-24 overflow-y-auto text-amber-300">
+                      {importResult.errors.map((err, i) => (
+                        <div key={i}>• {err}</div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <form onSubmit={handleImportSubmit}>
+                <div className="flex justify-center items-center w-full">
+                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-44 border-2 border-slate-700 border-dashed rounded-2xl cursor-pointer hover:bg-slate-800/50 light:border-slate-300 light:hover:bg-slate-50 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                      <FileText className="w-8 h-8 mb-3 text-slate-400" />
+                      <p className="mb-1 text-sm font-semibold text-slate-300 light:text-slate-700">
+                        {csvFile ? csvFile.name : 'Click to upload CSV'}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        Must contain headers: student_id, name, roll_number, department, semester, email
+                      </p>
+                    </div>
+                    <input 
+                      id="dropzone-file" 
+                      type="file" 
+                      accept=".csv" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          setCsvFile(e.target.files[0]);
+                          setImportResult(null);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                
+                <div className="mt-6 flex justify-end gap-3">
+                  <button type="button" onClick={() => setShowImportModal(false)} className="btn-secondary px-5 py-2">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={!csvFile || importing} className="btn-primary px-5 py-2 flex items-center gap-2">
+                    {importing ? 'Processing...' : 'Import Data'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

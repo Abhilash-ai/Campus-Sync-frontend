@@ -1,15 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon, LogOut, User, Bell } from 'lucide-react';
+import { Sun, Moon, LogOut, Bell, AlertTriangle, Info, Navigation, ArrowRight } from 'lucide-react';
+import { api } from '../services/api';
+import { Link } from 'react-router-dom';
 
 interface NavbarProps {
   onMenuToggle?: () => void;
 }
 
+interface Notice {
+  _id: string;
+  title: string;
+  content: string;
+  priority: 'Urgent' | 'Important' | 'Normal';
+  category: string;
+  created_at: string;
+  author_name: string;
+}
+
 export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (user) {
+      api.get<Notice[]>('/notices')
+        .then(data => {
+          // Keep only the latest 4 notices for the dropdown
+          setNotices(data.slice(0, 4));
+        })
+        .catch(err => console.error("Failed to fetch notices for navbar", err));
+    }
+  }, [user]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="glass-panel sticky top-0 z-40 w-full px-6 py-4 flex items-center justify-between border-b border-slate-800/40 rounded-b-3xl">
@@ -36,10 +74,80 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
       {/* Control Actions */}
       <div className="flex items-center gap-4">
         {/* Notifications Mock */}
-        <button className="relative p-2.5 rounded-xl bg-slate-900/50 hover:bg-slate-800/50 border border-slate-800/50 text-slate-400 hover:text-white transition-all duration-200 light:bg-white/50 light:border-slate-200">
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-brand-500"></span>
-        </button>
+        <div className="relative" ref={dropdownRef}>
+          <button 
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2.5 rounded-xl bg-slate-900/50 hover:bg-slate-800/50 border border-slate-800/50 text-slate-400 hover:text-white transition-all duration-200 light:bg-white/50 light:border-slate-200"
+          >
+            <Bell className="w-4 h-4" />
+            {notices.length > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-pulse"></span>
+            )}
+          </button>
+
+          {showNotifications && (
+            <div className="absolute right-0 mt-3 w-80 glass-panel rounded-2xl border border-slate-800/60 shadow-2xl overflow-hidden animate-fadeIn light:border-slate-200 light:bg-white z-50">
+              <div className="px-4 py-3 border-b border-slate-800/50 bg-slate-900/50 flex items-center justify-between light:bg-slate-50 light:border-slate-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-300 light:text-slate-700">Notifications</span>
+                <span className="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded-full font-bold">
+                  {notices.length} New
+                </span>
+              </div>
+              
+              <div className="max-h-80 overflow-y-auto">
+                {notices.length === 0 ? (
+                  <div className="p-6 text-center text-xs text-slate-500">
+                    No new notifications
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-800/30 light:divide-slate-100">
+                    {notices.map((notice) => (
+                      <Link 
+                        key={notice._id}
+                        to="/notices"
+                        onClick={() => setShowNotifications(false)}
+                        className="block p-4 hover:bg-slate-800/30 transition-colors light:hover:bg-slate-50"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`mt-0.5 p-1.5 rounded-lg shrink-0 ${
+                            notice.priority === 'Urgent' ? 'bg-rose-500/10 text-rose-400' :
+                            notice.priority === 'Important' ? 'bg-amber-500/10 text-amber-400' :
+                            'bg-brand-500/10 text-brand-400'
+                          }`}>
+                            {notice.priority === 'Urgent' ? <AlertTriangle className="w-3.5 h-3.5" /> : 
+                             notice.priority === 'Important' ? <Info className="w-3.5 h-3.5" /> : 
+                             <Navigation className="w-3.5 h-3.5" />}
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-slate-200 mb-1 light:text-slate-800 line-clamp-2">
+                              {notice.title}
+                            </p>
+                            <p className="text-[10px] text-slate-500 flex items-center gap-1.5">
+                              <span>{new Date(notice.created_at).toLocaleDateString()}</span>
+                              <span className="w-1 h-1 rounded-full bg-slate-700"></span>
+                              <span className="text-brand-400">{notice.category}</span>
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              <div className="border-t border-slate-800/50 bg-slate-900/30 p-2 light:bg-slate-50 light:border-slate-200">
+                <Link 
+                  to="/notices"
+                  onClick={() => setShowNotifications(false)}
+                  className="flex items-center justify-center gap-2 text-xs font-semibold text-brand-400 hover:text-brand-300 py-1.5 transition-colors"
+                >
+                  View All Notices
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Theme Toggle */}
         <button 

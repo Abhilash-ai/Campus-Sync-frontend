@@ -27,20 +27,35 @@ export default {
           950: '#020617',
         }
       },
+      fontSize: {
+        // Custom xxs size used in badges, labels, and sidebar role text
+        xxs: ['0.65rem', { lineHeight: '1rem' }],
+      },
       fontFamily: {
         sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.3s ease-in-out',
+        'slide-up': 'slideUp 0.3s ease-out',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        fadeIn: {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        slideUp: {
+          from: { transform: 'translateY(8px)', opacity: '0' },
+          to: { transform: 'translateY(0)', opacity: '1' },
         }
       }
     },
   },
   plugins: [],
 }
+

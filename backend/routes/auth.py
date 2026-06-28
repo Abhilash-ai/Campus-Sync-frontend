@@ -130,13 +130,12 @@ def reset_password():
     if not user or user.get('reset_code') != code:
         return jsonify({'message': 'Invalid email or reset code.'}), 400
 
-    # Update password and clear reset code
+    # Update password and clear reset code (single $set with both fields)
     hashed = hash_password(new_password)
     db.users.update_one(
         {'_id': user['_id']},
         {
-            '$set': {'password_hash': hashed},
-            '$set': {'reset_code': None}
+            '$set': {'password_hash': hashed, 'reset_code': None}
         }
     )
 

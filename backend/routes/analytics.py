@@ -23,7 +23,12 @@ def calculate_student_attendance_pct(student_id):
 @analytics_bp.route('/correlation', methods=['GET'])
 @token_required(allowed_roles=['teacher', 'admin'])
 def get_correlation_data():
-    students = db.students.find()
+    department = request.args.get('department', 'All').strip()
+    query = {}
+    if department and department != 'All':
+        query['department'] = department
+        
+    students = db.students.find(query)
     correlation_list = []
     
     for s in students:
@@ -47,7 +52,12 @@ def get_correlation_data():
 @analytics_bp.route('/risk', methods=['GET'])
 @token_required(allowed_roles=['teacher', 'admin'])
 def get_risk_analysis():
-    students = db.students.find()
+    department = request.args.get('department', 'All').strip()
+    query = {}
+    if department and department != 'All':
+        query['department'] = department
+        
+    students = db.students.find(query)
     
     below_75 = []
     academic_risk = []

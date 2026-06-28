@@ -62,6 +62,7 @@ interface RiskData {
 
 export const Reports: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'trends' | 'correlation' | 'risk' | 'override'>('trends');
+  const [department, setDepartment] = useState('All');
   
   // Data States
   const [trends, setTrends] = useState<TrendData | null>(null);
@@ -89,10 +90,12 @@ export const Reports: React.FC = () => {
       setLoading(true);
       setError(null);
       
+      const param = department !== 'All' ? `?department=${encodeURIComponent(department)}` : '';
+      
       const [trendsData, correlationData, riskData] = await Promise.all([
-        api.get<TrendData>('/analytics/trends'),
-        api.get<CorrelationData[]>('/analytics/correlation'),
-        api.get<RiskData>('/analytics/risk')
+        api.get<TrendData>(`/analytics/trends${param}`),
+        api.get<CorrelationData[]>(`/analytics/correlation${param}`),
+        api.get<RiskData>(`/analytics/risk${param}`)
       ]);
 
       setTrends(trendsData);
@@ -107,7 +110,7 @@ export const Reports: React.FC = () => {
 
   useEffect(() => {
     fetchReportsData();
-  }, []);
+  }, [department]);
 
   const handleOverrideSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,8 +157,9 @@ export const Reports: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 animate-fadeIn">
       {/* Upper Tab Navigation Console */}
-      <div className="glass-panel p-2 rounded-2xl border border-slate-800/40 flex flex-wrap gap-1.5 light:bg-white light:border-slate-200">
-        <button
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="glass-panel p-2 rounded-2xl border border-slate-800/40 flex flex-wrap gap-1.5 light:bg-white light:border-slate-200">
+          <button
           onClick={() => setActiveTab('trends')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
             activeTab === 'trends'
@@ -199,6 +203,23 @@ export const Reports: React.FC = () => {
           <Edit3 className="w-4 h-4" />
           Teacher Override Log
         </button>
+        </div>
+        
+        {/* Department Filter */}
+        <div className="glass-panel px-4 py-2 rounded-2xl border border-slate-800/40 flex items-center gap-3 light:bg-white light:border-slate-200">
+          <span className="text-xs font-bold text-slate-400 light:text-slate-600 uppercase tracking-widest">Department</span>
+          <select 
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
+            className="bg-transparent text-sm font-semibold text-slate-200 light:text-slate-800 focus:outline-none cursor-pointer"
+          >
+            <option value="All" className="bg-slate-900 light:bg-white">All Departments</option>
+            <option value="Computer Science" className="bg-slate-900 light:bg-white">Computer Science</option>
+            <option value="Information Technology" className="bg-slate-900 light:bg-white">Information Technology</option>
+            <option value="Electronics" className="bg-slate-900 light:bg-white">Electronics</option>
+            <option value="Mechanical" className="bg-slate-900 light:bg-white">Mechanical</option>
+          </select>
+        </div>
       </div>
 
       {error && (

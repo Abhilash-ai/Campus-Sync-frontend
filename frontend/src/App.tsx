@@ -14,6 +14,10 @@ import { CameraAttendance } from './views/CameraAttendance';
 import { QRAttendance } from './views/QRAttendance';
 import { Reports } from './views/Reports';
 import { StudentProfile } from './views/StudentProfile';
+import { Noticeboard } from './views/Noticeboard';
+import { Timetable } from './views/Timetable';
+import { Assignments } from './views/Assignments';
+import { Leaderboard } from './views/Leaderboard';
 
 // Shared Components
 import { Navbar } from './components/Navbar';
@@ -123,6 +127,12 @@ export const App: React.FC = () => {
                 
                 {/* Student specific history calendars */}
                 <Route path="/logs" element={<StudentDashboard />} />
+
+                {/* Shared routes — all authenticated users */}
+                <Route path="/notices" element={<Noticeboard />} />
+                <Route path="/timetable" element={<Timetable />} />
+                <Route path="/assignments" element={<Assignments />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
 
                 {/* Teacher & Administrator Restricted checkpoints */}
                 <Route element={<ProtectedRoute allowedRoles={['teacher', 'admin']} />}>

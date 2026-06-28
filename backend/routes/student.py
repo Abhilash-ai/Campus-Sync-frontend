@@ -167,3 +167,75 @@ def register_face(student_id):
         'mode': features['mode'],
         'bbox': features['bbox']
     }), 200
+
+@student_bp.route('/bulk-import', methods=['POST'])
+@token_required(allowed_roles=['teacher', 'admin'])
+def bulk_import():
+    if 'file' not in request.files:
+        return jsonify({'message': 'No file uploaded.'}), 400
+        
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'message': 'No file selected.'}), 400
+        
+    if not file.filename.endswith('.csv'):
+        return jsonify({'message': 'Only .csv files are allowed.'}), 400
+        
+    try:
+        import csv
+        import io
+        
+        # Read file as text
+        stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+        csv_input = csv.DictReader(stream)
+        
+        required_columns = {'student_id', 'name', 'roll_number', 'department', 'semester', 'email'}
+        if not required_columns.issubset(set(csv_input.fieldnames or [])):
+            return jsonify({'message': f'CSV must contain columns: {", ".join(required_columns)}'}), 400
+            
+        inserted_count = 0
+        errors = []
+        
+        for row_idx, row in enumerate(csv_input, start=2):
+            student_id = row.get('student_id', '').strip().upper()
+            email = row.get('email', '').strip().lower()
+            
+            if not student_id or not email:
+                errors.append(f"Row {row_idx}: Missing student_id or email.")
+                continue
+                
+            if db.students.find_one({'student_id': student_id}):
+                errors.append(f"Row {row_idx}: Student ID {student_id} already exists.")
+                continue
+                
+            if db.students.find_one({'email': email}):
+                errors.append(f"Row {row_idx}: Email {email} already in use.")
+                continue
+                
+            new_student = {
+                'student_id': student_id,
+                'name': row.get('name', '').strip(),
+                'roll_number': row.get('roll_number', '').strip(),
+                'department': row.get('department', '').strip(),
+                'semester': row.get('semester', '').strip(),
+                'email': email,
+                'phone': row.get('phone', '').strip(),
+                'face_embeddings': None,
+                'qr_identity': f"QR_{student_id}_CS",
+                'performance': {
+                    'internal_marks': 75.0,
+                    'assignment_scores': 80.0,
+                    'exam_scores': 70.0,
+                    'gpa': 3.0
+                }
+            }
+            db.students.insert_one(new_student)
+            inserted_count += 1
+            
+        return jsonify({
+            'message': f'Successfully imported {inserted_count} students.',
+            'errors': errors
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'message': f'Error processing file: {str(e)}'}), 500
