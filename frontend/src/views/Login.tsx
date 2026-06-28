@@ -135,32 +135,6 @@ export const Login: React.FC = () => {
           </div>
         </div>
 
-        {/* Sandbox credentials shortcuts */}
-        <div className="glass-card mt-6 p-5 border border-slate-800/30">
-          <span className="text-xxs font-bold text-brand-400 uppercase tracking-widest block mb-3 light:text-brand-600">
-            Sandbox Testing Profiles
-          </span>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => fillDemo('teacher@campussync.edu', 'password123')}
-              className="bg-slate-950/60 hover:bg-slate-900 border border-slate-900 text-xxs font-medium py-2 rounded-xl transition-all duration-150 light:bg-white light:border-slate-200 hover:border-brand-500/20"
-            >
-              👩‍🏫 Teacher
-            </button>
-            <button
-              onClick={() => fillDemo('student@campussync.edu', 'password123')}
-              className="bg-slate-950/60 hover:bg-slate-900 border border-slate-900 text-xxs font-medium py-2 rounded-xl transition-all duration-150 light:bg-white light:border-slate-200 hover:border-brand-500/20"
-            >
-              🎓 Student
-            </button>
-            <button
-              onClick={() => fillDemo('admin@campussync.edu', 'password123')}
-              className="bg-slate-950/60 hover:bg-slate-900 border border-slate-900 text-xxs font-medium py-2 rounded-xl transition-all duration-150 light:bg-white light:border-slate-200 hover:border-brand-500/20"
-            >
-              🛠️ Admin
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
